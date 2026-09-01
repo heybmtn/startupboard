@@ -11,7 +11,7 @@ not_found_handling = "single-page-application"
 [[d1_databases]]
 binding = "DB"
 database_name = "startup-board"
-database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+database_id = "ffef25d3-b7df-4841-91eb-744d701aa9bb"
 migrations_dir = "migrations"
 
 [[r2_buckets]]
