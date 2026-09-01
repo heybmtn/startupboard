@@ -39,7 +39,7 @@ export default function TerritoryPage() {
           to={`/claim/${territory.slug}`}
           className="mt-6 rounded-full bg-indigo-500 px-6 py-3 font-display font-semibold text-white hover:bg-indigo-400"
         >
-          Claim it for {formatPrice(territory.pricePence)}
+          Claim it for {formatPrice(territory.nextPricePence)}
         </Link>
         <Link to="/" className="mt-4 text-sm text-slate-500 underline">
           Back to the board
@@ -106,6 +106,16 @@ export default function TerritoryPage() {
           <p className="border-t border-white/10 pt-4 text-xs text-slate-500">
             This territory is sponsored by {territory.companyName || territory.ownerName}.
           </p>
+
+          <div className="border-t border-white/10 pt-4">
+            <p className="text-sm text-slate-400">Think you can do better?</p>
+            <Link
+              to={`/claim/${territory.slug}`}
+              className="mt-2 inline-flex items-center justify-center rounded-full border border-white/20 px-6 py-2.5 font-display font-semibold text-white transition-colors hover:bg-white/10"
+            >
+              Take over for {formatPrice(territory.nextPricePence)}
+            </Link>
+          </div>
         </div>
       </div>
     </div>

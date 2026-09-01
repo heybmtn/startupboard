@@ -10,18 +10,23 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [justClaimedSlug, setJustClaimedSlug] = useState<string | null>(null);
-  const prevStatuses = useRef<Record<string, string>>({});
+  // Keyed by purchasedAt rather than status, so a takeover of an
+  // already-sold territory (status stays "sold" throughout) still triggers
+  // the claim animation, not just a territory's first-ever sale.
+  const prevPurchasedAt = useRef<Record<string, string | null>>({});
 
   async function load() {
     try {
       const data = await fetchTerritories();
-      const prev = prevStatuses.current;
-      const newlySold = data.find((t) => t.status === "sold" && prev[t.slug] && prev[t.slug] !== "sold");
+      const prev = prevPurchasedAt.current;
+      const newlySold = data.find(
+        (t) => t.status === "sold" && t.slug in prev && prev[t.slug] !== t.purchasedAt
+      );
       if (newlySold) {
         setJustClaimedSlug(newlySold.slug);
         setTimeout(() => setJustClaimedSlug(null), 1200);
       }
-      prevStatuses.current = Object.fromEntries(data.map((t) => [t.slug, t.status]));
+      prevPurchasedAt.current = Object.fromEntries(data.map((t) => [t.slug, t.purchasedAt]));
       setTerritories(data);
       setError(null);
     } catch (err) {

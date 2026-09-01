@@ -10,19 +10,14 @@ interface Props {
 
 export default function TerritoryTile({ territory, justClaimed, variant = "board" }: Props) {
   const isSold = territory.status === "sold";
-  const isPending = territory.status === "pending";
-  const isPremium = territory.pricePence >= 24900;
+  const isPremium = territory.pricePence >= 4500;
 
   const content = (
     <div
       className={[
         "group relative flex h-full w-full flex-col justify-between overflow-hidden rounded-lg border p-2 text-left transition-all",
         variant === "grid" ? "min-h-[128px] p-3" : "min-h-0",
-        isSold
-          ? "border-white/20 shadow-tile"
-          : isPending
-            ? "border-white/10 opacity-70"
-            : "border-white/10 hover:border-white/40 hover:-translate-y-0.5",
+        isSold ? "border-white/20 shadow-tile" : "border-white/10 hover:border-white/40 hover:-translate-y-0.5",
         justClaimed ? "animate-claim" : "",
       ].join(" ")}
       style={{
@@ -60,17 +55,16 @@ export default function TerritoryTile({ territory, justClaimed, variant = "board
             />
           ) : null}
           <span
-            className={[
-              "text-[9px] font-bold uppercase tracking-wide",
-              isSold ? "text-white/90" : isPending ? "text-amber-400" : "text-emerald-400",
-            ].join(" ")}
+            className={["text-[9px] font-bold uppercase tracking-wide", isSold ? "text-white/90" : "text-emerald-400"].join(
+              " "
+            )}
           >
-            {isSold ? "🔴 Owned" : isPending ? "⏳ Reserved" : "🟢 Available"}
+            {isSold ? "🔴 Owned" : "🟢 Available"}
           </span>
         </div>
-        {!isSold && (
-          <span className="text-[11px] font-bold text-slate-100">{formatPrice(territory.pricePence)}</span>
-        )}
+        <span className={["text-[11px] font-bold", isSold ? "text-white/90" : "text-slate-100"].join(" ")}>
+          {isSold ? `Take: ${formatPrice(territory.nextPricePence)}` : formatPrice(territory.nextPricePence)}
+        </span>
       </div>
     </div>
   );
@@ -81,10 +75,6 @@ export default function TerritoryTile({ territory, justClaimed, variant = "board
         {content}
       </Link>
     );
-  }
-
-  if (isPending) {
-    return <div className="h-full w-full cursor-not-allowed">{content}</div>;
   }
 
   return (

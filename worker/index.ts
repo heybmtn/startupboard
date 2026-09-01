@@ -41,14 +41,20 @@ export default {
   fetch: app.fetch,
 
   async scheduled(_event: ScheduledEvent, env: Env) {
-    // Release reservations for checkouts that were started but never
-    // completed within the pending window.
+    // Clear out abandoned claim/takeover attempts that never completed
+    // payment within the pending window. The current owner (if any) is
+    // untouched — only the challenger's pending_* columns are cleared.
     await env.DB.prepare(
       `UPDATE territories
-       SET status = 'available',
+       SET pending_owner_name = NULL,
+           pending_company_name = NULL,
+           pending_owner_description = NULL,
+           pending_website_url = NULL,
+           pending_logo_url = NULL,
+           stripe_checkout_session_id = NULL,
            pending_until = NULL,
            updated_at = datetime('now')
-       WHERE status = 'pending' AND pending_until IS NOT NULL AND pending_until < datetime('now')`
+       WHERE pending_until IS NOT NULL AND pending_until < datetime('now')`
     ).run();
   },
 };

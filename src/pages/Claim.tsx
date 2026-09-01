@@ -83,18 +83,7 @@ export default function Claim() {
     return <div className="py-24 text-center text-slate-500">Loading…</div>;
   }
 
-  if (territory.status !== "available") {
-    return (
-      <div className="mx-auto flex min-h-screen max-w-lg flex-col items-center justify-center px-4 text-center">
-        <p className="text-lg font-semibold text-amber-300">
-          The {territory.name} territory is no longer available.
-        </p>
-        <Link to="/" className="mt-4 text-indigo-400 underline">
-          Back to the board
-        </Link>
-      </div>
-    );
-  }
+  const isTakeover = territory.status === "sold";
 
   return (
     <div className="mx-auto min-h-screen max-w-lg px-4 py-12">
@@ -102,8 +91,17 @@ export default function Claim() {
         ← Back to the board
       </Link>
 
-      <h1 className="mt-4 font-display text-3xl font-bold text-white">Claim {territory.name} Territory</h1>
-      <p className="mt-1 text-lg font-semibold text-indigo-300">Price: {formatPrice(territory.pricePence)}</p>
+      <h1 className="mt-4 font-display text-3xl font-bold text-white">
+        {isTakeover ? "Take over" : "Claim"} {territory.name} Territory
+      </h1>
+      {isTakeover && (
+        <p className="mt-1 text-sm text-slate-400">
+          Currently owned by {territory.companyName || territory.ownerName}. Pay more to take their spot.
+        </p>
+      )}
+      <p className="mt-1 text-lg font-semibold text-indigo-300">
+        Price: {formatPrice(territory.nextPricePence)}
+      </p>
 
       <form onSubmit={handleSubmit} className="mt-8 space-y-5">
         <div>

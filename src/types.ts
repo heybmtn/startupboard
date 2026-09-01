@@ -6,6 +6,7 @@ export interface Territory {
   slug: string;
   description: string;
   pricePence: number;
+  nextPricePence: number;
   colour: string;
   position: number;
   status: TerritoryStatus;

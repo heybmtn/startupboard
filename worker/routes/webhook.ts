@@ -38,31 +38,45 @@ webhookRoute.post("/stripe", async (c) => {
     const territorySlug = session.metadata?.territory_slug;
     const paymentIntentId =
       typeof session.payment_intent === "string" ? session.payment_intent : session.payment_intent?.id;
+    const amountPaid = session.amount_total;
 
-    if (!territorySlug) {
-      console.error("Webhook missing territory_slug metadata", event.id);
+    if (!territorySlug || amountPaid == null) {
+      console.error("Webhook missing territory_slug metadata or amount", event.id);
       return c.json({ received: true });
     }
 
-    // Atomic: only flips a still-available/pending territory tied to *this*
-    // checkout session to sold. Guarantees a territory can never sell twice,
-    // even under concurrent/duplicate webhook delivery.
+    // Atomic: promotes the challenger who made *this* checkout session into
+    // the live owner — first sale or a takeover, doesn't matter, the
+    // pending_* -> owner_* copy is the same either way. Matching on
+    // stripe_checkout_session_id (only set for the currently active
+    // challenge on this territory) means a stale/replayed session can never
+    // resell a territory that's since moved on to a new challenge.
     const result = await c.env.DB.prepare(
       `UPDATE territories
        SET status = 'sold',
-           stripe_payment_intent_id = ?1,
+           owner_name = pending_owner_name,
+           company_name = pending_company_name,
+           owner_description = pending_owner_description,
+           website_url = pending_website_url,
+           logo_url = pending_logo_url,
+           price_pence = ?1,
+           stripe_payment_intent_id = ?2,
            purchased_at = datetime('now'),
            pending_until = NULL,
+           pending_owner_name = NULL,
+           pending_company_name = NULL,
+           pending_owner_description = NULL,
+           pending_website_url = NULL,
+           pending_logo_url = NULL,
            updated_at = datetime('now')
-       WHERE slug = ?2
-         AND stripe_checkout_session_id = ?3
-         AND status != 'sold'`
+       WHERE slug = ?3
+         AND stripe_checkout_session_id = ?4`
     )
-      .bind(paymentIntentId ?? null, territorySlug, session.id)
+      .bind(amountPaid, paymentIntentId ?? null, territorySlug, session.id)
       .run();
 
     if (!result.meta.changes) {
-      console.warn("Webhook checkout.session.completed did not match a claimable territory", {
+      console.warn("Webhook checkout.session.completed did not match an active challenge", {
         eventId: event.id,
         territorySlug,
         sessionId: session.id,

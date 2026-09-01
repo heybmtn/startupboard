@@ -71,7 +71,12 @@ adminRoute.patch("/territories/:id", async (c) => {
       "stripe_checkout_session_id = NULL",
       "stripe_payment_intent_id = NULL",
       "pending_until = NULL",
-      "purchased_at = NULL"
+      "purchased_at = NULL",
+      "pending_owner_name = NULL",
+      "pending_company_name = NULL",
+      "pending_owner_description = NULL",
+      "pending_website_url = NULL",
+      "pending_logo_url = NULL"
     );
   }
 
