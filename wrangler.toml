@@ -22,7 +22,7 @@ bucket_name = "startup-board-logos"
 crons = ["*/10 * * * *"]
 
 [vars]
-PUBLIC_SITE_URL = "http://localhost:5173"
+PUBLIC_SITE_URL = "https://startup-board.ben-d-manton.workers.dev"
 
 # Secrets (set with `wrangler secret put <NAME>`, or in .dev.vars for local dev):
 #   STRIPE_SECRET_KEY
