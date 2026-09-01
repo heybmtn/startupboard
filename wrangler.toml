@@ -1,0 +1,31 @@
+name = "startup-board"
+main = "worker/index.ts"
+compatibility_date = "2024-11-01"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "startup-board"
+database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+migrations_dir = "migrations"
+
+[[r2_buckets]]
+binding = "LOGOS"
+bucket_name = "startup-board-logos"
+
+[triggers]
+crons = ["*/10 * * * *"]
+
+[vars]
+PUBLIC_SITE_URL = "http://localhost:5173"
+
+# Secrets (set with `wrangler secret put <NAME>`, or in .dev.vars for local dev):
+#   STRIPE_SECRET_KEY
+#   STRIPE_WEBHOOK_SECRET
+#   STRIPE_PUBLISHABLE_KEY
+#   ADMIN_SECRET
